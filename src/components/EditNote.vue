@@ -1,18 +1,12 @@
 <template>
-  <v-btn
-    v-show="!visible"
-    class="mx-auto"
-    prepend-icon="mdi-note-plus"
-    color="secondary"
-    @click="visible = true"
-  >
-    Create a new Note
-  </v-btn>
   <v-dialog
-    v-model="visible"
+    :model-value="visible"
     scrollable
   >
-    <v-card title="Creating note">
+    <v-card
+      v-if="note?.id > 0"
+      title="Editing note"
+    >
       <v-card-text>
         <v-textarea
           v-model="note.content"
@@ -37,7 +31,7 @@
         >
           Cancel
         </v-btn>
-        <v-btn @click="createNote">
+        <v-btn @click="emit('save', note)">
           Save note
         </v-btn>
       </v-card-actions>
@@ -45,24 +39,17 @@
   </v-dialog>
 </template>
 <script setup>
-import { computed, reactive, ref } from 'vue';
-import { useNotesStore } from '@/plugins/pinia';
+import { computed } from 'vue';
 
-const { saveNote } = useNotesStore();
+const emit = defineEmits(['update:editable', 'save']);
 
-const visible = ref(false);
-
-const note = reactive({
-  content: null,
-  encrypted: false,
+const props = defineProps({
+  visible: { type: Boolean, default: false },
+  editable: { type: Object, default: null },
 });
 
-async function createNote() {
-  await saveNote(note);
-
-  visible.value = false;
-
-  note.content = null;
-  note.encrypted = false;
-}
+const note = computed({
+  get() { return props.editable; },
+  set(value) { emit('update:editable'); },
+});
 </script>

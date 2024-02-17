@@ -1,8 +1,9 @@
 const dark = {
   dark: true,
   colors: {
-    primary: '#756ab6',
-    secondary: '#ac87c5',
+    primary: '#f0f3ff',
+    secondary: '#15f5ba',
+    surface: '#211951',
   },
 };
 

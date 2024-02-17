@@ -4,30 +4,34 @@ import { defineStore } from 'pinia';
 export default defineStore('notes', {
   state() {
     return {
-      note: '',
-      hasEncryption: false,
       notes: [],
       key: new Uint8Array(16),
       iv: new Uint8Array(16),
     };
   },
   actions: {
-    async saveNote() {
+    async saveNote({ content, encrypted }) {
       const { encrypt } = useCrypto();
-      const { hasEncryption, note } = this;
-      let content = note;
-      if (hasEncryption) {
-        content = await encrypt(note, this.key, this.iv);
+
+      if (encrypted) {
+        content = await encrypt(content, this.key, this.iv);
       }
 
       this.notes.push({
-        id: this.notes.length + 2,
+        id: this.notes.length + 1,
         content,
-        hasEncryption,
+        encrypted,
       });
+    },
+    async updateNote({ id, content, encrypted }) {
+      const { encrypt } = useCrypto();
 
-      this.note = '';
-      this.hasEncryption = false;
+      if (encrypted) {
+        content = await encrypt(content, this.key, this.iv);
+      }
+
+      const index = this.notes.findIndex(n => n.id === id);
+      this.notes[index] = { id, content, encrypted };
     },
   },
 });
